@@ -1,0 +1,176 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a Pharmacy API.",
+        "title": "Swagger Example API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api",
+    "paths": {
+        "/create_pharmacy": {
+            "post": {
+                "description": "Adds a new pharmacy entity to DB",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Create a pharmacy",
+                "parameters": [
+                    {
+                        "description": "Add Pharmacy",
+                        "name": "pharmacy",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Pharmacy"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "pharmacy created"
+                    },
+                    "422": {
+                        "description": "repquest failed"
+                    }
+                }
+            }
+        },
+        "/delete_pharmacy/{id}": {
+            "delete": {
+                "description": "Delete a single pharmacy by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Delete a pharmacy",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pharmacy ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "pharmacy deleted"
+                    },
+                    "400": {
+                        "description": "ID is required"
+                    },
+                    "404": {
+                        "description": "Could not delete pharmacy"
+                    }
+                }
+            }
+        },
+        "/get_pharmacies": {
+            "get": {
+                "description": "Retrieves all pharmacies from DB",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Retrieve all pharmacies",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Pharmacy"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Could not get pharmacies"
+                    }
+                }
+            }
+        },
+        "/get_pharmacy/{id}": {
+            "get": {
+                "description": "Retrieves a single pharmacy by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Retrieve a pharmacy",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pharmacy ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Pharmacy"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required"
+                    },
+                    "404": {
+                        "description": "Could not get pharmacy"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.Pharmacy": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
