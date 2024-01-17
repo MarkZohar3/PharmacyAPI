@@ -20,6 +20,75 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/create_pharmacy": {
+            "post": {
+                "description": "Adds a new pharmacy entity to DB",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Create a pharmacy",
+                "parameters": [
+                    {
+                        "description": "Add Pharmacy",
+                        "name": "pharmacy",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Pharmacy"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "pharmacy created"
+                    },
+                    "422": {
+                        "description": "repquest failed"
+                    }
+                }
+            }
+        },
+        "/delete_pharmacy/{id}": {
+            "delete": {
+                "description": "Delete a single pharmacy by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Delete a pharmacy",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pharmacy ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "pharmacy deleted"
+                    },
+                    "400": {
+                        "description": "ID is required"
+                    },
+                    "404": {
+                        "description": "Could not delete pharmacy"
+                    }
+                }
+            }
+        },
         "/get_pharmacies": {
             "get": {
                 "description": "Retrieves all pharmacies from DB",
@@ -30,7 +99,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "pharmacies"
+                    "Pharmacy"
                 ],
                 "summary": "Retrieve all pharmacies",
                 "responses": {
@@ -45,6 +114,47 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Could not get pharmacies"
+                    }
+                }
+            }
+        },
+        "/get_pharmacy/{id}": {
+            "get": {
+                "description": "Retrieves a single pharmacy by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pharmacy"
+                ],
+                "summary": "Retrieve a pharmacy",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Pharmacy ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Pharmacy"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "ID is required"
+                    },
+                    "404": {
+                        "description": "Could not get pharmacy"
                     }
                 }
             }

@@ -36,6 +36,18 @@ type Repository struct {
 	DB *gorm.DB
 }
 
+// ShowPharmacies godoc
+// @Summary      Create a pharmacy
+// @Description  Adds a new pharmacy entity to DB
+// @Tags         Pharmacy
+// @Accept       json
+// @Produce      json
+//
+//	@Param		 pharmacy	body		models.Pharmacy	true	"Add Pharmacy"
+//
+// @Router       /create_pharmacy [post]
+// @Success      200  "pharmacy created"
+// @Failure      422  "repquest failed"
 func (r *Repository) CreatePharmacy(context *fiber.Ctx) error {
 	pharmacy := Pharmacy{}
 
@@ -60,7 +72,7 @@ func (r *Repository) CreatePharmacy(context *fiber.Ctx) error {
 // ShowPharmacies godoc
 // @Summary      Retrieve all pharmacies
 // @Description  Retrieves all pharmacies from DB
-// @Tags         pharmacies
+// @Tags         Pharmacy
 // @Accept       json
 // @Produce      json
 // @Router       /get_pharmacies [get]
@@ -84,6 +96,19 @@ func (r *Repository) GetPharmacies(context *fiber.Ctx) error {
 	return nil
 }
 
+// ShowPharmacy godoc
+// @Summary      	Retrieve a pharmacy
+// @Description  	Retrieves a single pharmacy by ID
+// @Tags         	Pharmacy
+// @Accept       	json
+// @Produce     	json
+//
+//	@Param			id	path		int	true	"Pharmacy ID"
+//
+// @Success      	200  {array}  models.Pharmacy
+// @Failure      	400  "ID is required"
+// @Failure      	404  "Could not get pharmacy"
+// @Router       	/get_pharmacy/{id} [get]
 func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 	id := context.Params("id")
 	pharmacyModel := &models.Pharmacy{}
@@ -95,11 +120,18 @@ func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 
 	fmt.Println("the Id is: ", id)
 
-	err := r.DB.Where("id = ?", id).First(pharmacyModel).Error
-	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(
+	result := r.DB.Where("id = ?", id).First(pharmacyModel)
+	if result.Error != nil {
+		context.Status(http.StatusNotFound).JSON(
 			&fiber.Map{"message": "could not get pharmacy"})
-		return err
+		return nil
+	}
+
+	if result.RowsAffected == 0 {
+		// No rows were affected, meaning the record with the given ID was not found
+		context.Status(http.StatusNotFound).JSON(
+			&fiber.Map{"message": "pharmacy not found for deletion"})
+		return nil
 	}
 
 	context.Status(http.StatusOK).JSON(&fiber.Map{
@@ -110,6 +142,19 @@ func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 	return nil
 }
 
+// DeletePharmacy godoc
+// @Summary      	Delete a pharmacy
+// @Description  	Delete a single pharmacy by ID
+// @Tags         	Pharmacy
+// @Accept       	json
+// @Produce     	json
+//
+//	@Param			id	path		int	true	"Pharmacy ID"
+//
+// @Success      	200  "pharmacy deleted"
+// @Failure      	400  "ID is required"
+// @Failure      	404  "Could not delete pharmacy"
+// @Router       	/delete_pharmacy/{id} [delete]
 func (r *Repository) DeletePharmacy(context *fiber.Ctx) error {
 	pharmacyModel := &[]models.Pharmacy{}
 	id := context.Params("id")
@@ -121,12 +166,19 @@ func (r *Repository) DeletePharmacy(context *fiber.Ctx) error {
 		return nil
 	}
 
-	err := r.DB.Delete(pharmacyModel, id)
+	result := r.DB.Delete(pharmacyModel, id)
 
-	if err.Error != nil {
+	if result.Error != nil {
 		context.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not delete pharmacy"})
-		return err.Error
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		// No rows were affected, meaning the record with the given ID was not found
+		context.Status(http.StatusNotFound).JSON(
+			&fiber.Map{"message": "pharmacy not found for deletion"})
+		return nil
 	}
 
 	context.Status(http.StatusOK).JSON(&fiber.Map{"message": "pharmacy deleted"})

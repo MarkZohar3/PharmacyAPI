@@ -22,6 +22,51 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /create_pharmacy:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new pharmacy entity to DB
+      parameters:
+      - description: Add Pharmacy
+        in: body
+        name: pharmacy
+        required: true
+        schema:
+          $ref: '#/definitions/models.Pharmacy'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pharmacy created
+        "422":
+          description: repquest failed
+      summary: Create a pharmacy
+      tags:
+      - Pharmacy
+  /delete_pharmacy/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a single pharmacy by ID
+      parameters:
+      - description: Pharmacy ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: pharmacy deleted
+        "400":
+          description: ID is required
+        "404":
+          description: Could not delete pharmacy
+      summary: Delete a pharmacy
+      tags:
+      - Pharmacy
   /get_pharmacies:
     get:
       consumes:
@@ -40,5 +85,32 @@ paths:
           description: Could not get pharmacies
       summary: Retrieve all pharmacies
       tags:
-      - pharmacies
+      - Pharmacy
+  /get_pharmacy/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single pharmacy by ID
+      parameters:
+      - description: Pharmacy ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Pharmacy'
+            type: array
+        "400":
+          description: ID is required
+        "404":
+          description: Could not get pharmacy
+      summary: Retrieve a pharmacy
+      tags:
+      - Pharmacy
 swagger: "2.0"
