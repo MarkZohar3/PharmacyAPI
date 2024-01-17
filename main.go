@@ -42,12 +42,10 @@ type Repository struct {
 // @Tags         Pharmacy
 // @Accept       json
 // @Produce      json
-//
-//	@Param		 pharmacy	body		models.Pharmacy	true	"Add Pharmacy"
-//
 // @Router       /create_pharmacy [post]
 // @Success      200  "pharmacy created"
 // @Failure      422  "repquest failed"
+// @Param		 pharmacy	body		models.Pharmacy	true	"Add Pharmacy"
 func (r *Repository) CreatePharmacy(context *fiber.Ctx) error {
 	pharmacy := Pharmacy{}
 
@@ -102,9 +100,7 @@ func (r *Repository) GetPharmacies(context *fiber.Ctx) error {
 // @Tags         	Pharmacy
 // @Accept       	json
 // @Produce     	json
-//
-//	@Param			id	path		int	true	"Pharmacy ID"
-//
+// @Param			id	path		int	true	"Pharmacy ID"
 // @Success      	200  {array}  models.Pharmacy
 // @Failure      	400  "ID is required"
 // @Failure      	404  "Could not get pharmacy"
@@ -121,16 +117,9 @@ func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 	fmt.Println("the Id is: ", id)
 
 	result := r.DB.Where("id = ?", id).First(pharmacyModel)
-	if result.Error != nil {
+	if result.Error != nil || result.RowsAffected == 0 {
 		context.Status(http.StatusNotFound).JSON(
 			&fiber.Map{"message": "could not get pharmacy"})
-		return nil
-	}
-
-	if result.RowsAffected == 0 {
-		// No rows were affected, meaning the record with the given ID was not found
-		context.Status(http.StatusNotFound).JSON(
-			&fiber.Map{"message": "pharmacy not found for deletion"})
 		return nil
 	}
 
@@ -148,9 +137,7 @@ func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 // @Tags         	Pharmacy
 // @Accept       	json
 // @Produce     	json
-//
-//	@Param			id	path		int	true	"Pharmacy ID"
-//
+// @Param			id	path		int	true	"Pharmacy ID"
 // @Success      	200  "pharmacy deleted"
 // @Failure      	400  "ID is required"
 // @Failure      	404  "Could not delete pharmacy"
