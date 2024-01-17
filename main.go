@@ -8,10 +8,23 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	fiberSwagger "github.com/swaggo/fiber-swagger" // fiber-swagger middleware
+	_ "go.mod/docs"
 	"go.mod/models"
 	"go.mod/storage"
 	"gorm.io/gorm"
 )
+
+// @title Swagger Example API
+// @version 1.0
+// @description This is a Pharmacy API.
+// @termsOfService http://swagger.io/terms/
+
+// @host localhost:8080
+// @BasePath /api
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 type Pharmacy struct {
 	Owner   string `json:"owner"`
@@ -44,6 +57,15 @@ func (r *Repository) CreatePharmacy(context *fiber.Ctx) error {
 	return nil
 }
 
+// ShowPharmacies godoc
+// @Summary      Retrieve all pharmacies
+// @Description  Retrieves all pharmacies from DB
+// @Tags         pharmacies
+// @Accept       json
+// @Produce      json
+// @Router       /get_pharmacies [get]
+// @Success      200  {array}  models.Pharmacy
+// @Failure      400  "Could not get pharmacies"
 func (r *Repository) GetPharmacies(context *fiber.Ctx) error {
 	pharmacyModels := &[]models.Pharmacy{}
 
@@ -149,7 +171,11 @@ func main() {
 	}
 
 	app := fiber.New()
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 	r.SetupRoutes(app)
-	app.Listen(":8080")
+	err = app.Listen(":8080")
+	if err != nil {
+		log.Fatalf("fiber.Listen failed %s", err)
+	}
 
 }
