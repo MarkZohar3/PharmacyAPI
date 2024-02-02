@@ -8,10 +8,23 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	fiberSwagger "github.com/swaggo/fiber-swagger" // fiber-swagger middleware
+	_ "go.mod/docs"
 	"go.mod/models"
 	"go.mod/storage"
 	"gorm.io/gorm"
 )
+
+// @title Swagger Example API
+// @version 1.0
+// @description This is a Pharmacy API.
+// @termsOfService http://swagger.io/terms/
+
+// @host localhost:8080
+// @BasePath /api
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
 type Pharmacy struct {
 	Owner   string `json:"owner"`
@@ -23,6 +36,16 @@ type Repository struct {
 	DB *gorm.DB
 }
 
+// ShowPharmacies godoc
+// @Summary      Create a pharmacy
+// @Description  Adds a new pharmacy entity to DB
+// @Tags         Pharmacy
+// @Accept       json
+// @Produce      json
+// @Router       /create_pharmacy [post]
+// @Success      200  "pharmacy created"
+// @Failure      422  "repquest failed"
+// @Param		 pharmacy	body		models.Pharmacy	true	"Add Pharmacy"
 func (r *Repository) CreatePharmacy(context *fiber.Ctx) error {
 	pharmacy := Pharmacy{}
 
@@ -44,6 +67,15 @@ func (r *Repository) CreatePharmacy(context *fiber.Ctx) error {
 	return nil
 }
 
+// ShowPharmacies godoc
+// @Summary      Retrieve all pharmacies
+// @Description  Retrieves all pharmacies from DB
+// @Tags         Pharmacy
+// @Accept       json
+// @Produce      json
+// @Router       /get_pharmacies [get]
+// @Success      200  {array}  models.Pharmacy
+// @Failure      400  "Could not get pharmacies"
 func (r *Repository) GetPharmacies(context *fiber.Ctx) error {
 	pharmacyModels := &[]models.Pharmacy{}
 
@@ -62,6 +94,17 @@ func (r *Repository) GetPharmacies(context *fiber.Ctx) error {
 	return nil
 }
 
+// ShowPharmacy godoc
+// @Summary      	Retrieve a pharmacy
+// @Description  	Retrieves a single pharmacy by ID
+// @Tags         	Pharmacy
+// @Accept       	json
+// @Produce     	json
+// @Param			id	path		int	true	"Pharmacy ID"
+// @Success      	200  {array}  models.Pharmacy
+// @Failure      	400  "ID is required"
+// @Failure      	404  "Could not get pharmacy"
+// @Router       	/get_pharmacy/{id} [get]
 func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 	id := context.Params("id")
 	pharmacyModel := &models.Pharmacy{}
@@ -73,11 +116,11 @@ func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 
 	fmt.Println("the Id is: ", id)
 
-	err := r.DB.Where("id = ?", id).First(pharmacyModel).Error
-	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(
+	result := r.DB.Where("id = ?", id).First(pharmacyModel)
+	if result.Error != nil || result.RowsAffected == 0 {
+		context.Status(http.StatusNotFound).JSON(
 			&fiber.Map{"message": "could not get pharmacy"})
-		return err
+		return nil
 	}
 
 	context.Status(http.StatusOK).JSON(&fiber.Map{
@@ -88,6 +131,17 @@ func (r *Repository) GetPharmacyByID(context *fiber.Ctx) error {
 	return nil
 }
 
+// DeletePharmacy godoc
+// @Summary      	Delete a pharmacy
+// @Description  	Delete a single pharmacy by ID
+// @Tags         	Pharmacy
+// @Accept       	json
+// @Produce     	json
+// @Param			id	path		int	true	"Pharmacy ID"
+// @Success      	200  "pharmacy deleted"
+// @Failure      	400  "ID is required"
+// @Failure      	404  "Could not delete pharmacy"
+// @Router       	/delete_pharmacy/{id} [delete]
 func (r *Repository) DeletePharmacy(context *fiber.Ctx) error {
 	pharmacyModel := &[]models.Pharmacy{}
 	id := context.Params("id")
@@ -99,12 +153,19 @@ func (r *Repository) DeletePharmacy(context *fiber.Ctx) error {
 		return nil
 	}
 
-	err := r.DB.Delete(pharmacyModel, id)
+	result := r.DB.Delete(pharmacyModel, id)
 
-	if err.Error != nil {
+	if result.Error != nil {
 		context.Status(http.StatusBadRequest).JSON(
 			&fiber.Map{"message": "could not delete pharmacy"})
-		return err.Error
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		// No rows were affected, meaning the record with the given ID was not found
+		context.Status(http.StatusNotFound).JSON(
+			&fiber.Map{"message": "pharmacy not found for deletion"})
+		return nil
 	}
 
 	context.Status(http.StatusOK).JSON(&fiber.Map{"message": "pharmacy deleted"})
@@ -149,7 +210,11 @@ func main() {
 	}
 
 	app := fiber.New()
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 	r.SetupRoutes(app)
-	app.Listen(":8080")
+	err = app.Listen(":8080")
+	if err != nil {
+		log.Fatalf("fiber.Listen failed %s", err)
+	}
 
 }
