@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  web:
+    container_name: pharmacy_backend_container_local
+    build: 
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/usr/src/app
+    command: go run main.go -b 0.0.0.0
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    container_name: postgres_container
+    image: postgres:alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}"
+      - POSTGRES_PASSWORD=${DB_PASS}"
+      - POSTGRES_DB=${DB_NAME}"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d pharmacy -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  postgres-db:
+
