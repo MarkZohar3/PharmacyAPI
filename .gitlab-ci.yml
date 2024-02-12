@@ -36,3 +36,5 @@ deploy:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'
       when: manual
+  only:
+    - merge_requests
