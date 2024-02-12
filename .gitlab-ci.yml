@@ -35,3 +35,5 @@ deploy:
     - docker push $DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
 #  only:
 #    - develop
+
+#testing...
