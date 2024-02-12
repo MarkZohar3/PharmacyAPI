@@ -5,8 +5,8 @@ stages:
 
 variables:
   DOCKER_IMAGE_NAME: markzohar3/pharmacy_service
-  DOCKER_USERNAME: $DOCKER_USERNAME # Set this in GitLab CI/CD environment variables
-  DOCKER_PASSWORD: $DOCKER_PASSWORD # Set this in GitLab CI/CD environment variables
+  DOCKER_USERNAME: $DOCKER_USERNAME 
+  DOCKER_PASSWORD: $DOCKER_PASSWORD 
 
 before_script:
   - echo "Starting CI/CD pipeline..."
@@ -32,9 +32,7 @@ deploy:
     - docker:dind
   script:
     - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-    - docker build -t $DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
-    - docker push $DOCKER_IMAGE_NAME:$CI_COMMIT_SHORT_SHA
-#  only:
-#    - develop
-
-#testing...
+    - docker push $DOCKER_IMAGE_NAME:$CI_COMMIT_BRANCH-$CI_COMMIT_SHORT_SHA
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"'
+#      when: manual
