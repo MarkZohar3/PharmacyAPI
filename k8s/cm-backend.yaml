@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-cm
+data:
+  DB_HOST: "pharmacy-app-db"
+  DB_PORT: "5432"
+  DB_USER: "postgres"
+  DB_PASSWORD: "postgres"
+  DB_NAME: "pharmacy"
+  DB_SSL_MODE: "disable"
