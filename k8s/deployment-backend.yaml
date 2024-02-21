@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-app-backend
+  labels:
+    app: pharmacy-app-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pharmacy-app-backend
+  template:
+    metadata:
+      labels:
+        app: pharmacy-app-backend
+    spec:
+      containers:
+      - name: pharmacy-backend
+        image: markzohar3/pharmacy_service:backend
+        command: ["go"]
+        args: ["run", "main.go", "-b", "0.0.0.0"]
+        envFrom:
+        - configMapRef:
+            name: backend-cm
+        ports:
+        - containerPort: 8080
+
+        #volumeMounts: 
+        #- name: backend-mount
+        #  mountPath: "/usr/src/app"
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command: ['sh', '-c', 'until nc -z pharmacy-app-db 5432; do echo waiting for database; sleep 2; done;']
+     # volumes:
+      #  - name: backend-mount
+      #    emptyDir: {}
+

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pharmacy-app-db
+  labels:
+    app: pharmacy-app-db
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pharmacy-app-db
+  template:
+    metadata:
+      labels:
+        app: pharmacy-app-db
+    spec:
+      containers:
+      - name: pharmacy-db
+        image: postgres:alpine
+        envFrom:
+        - configMapRef:
+            name: db-cm
+        ports:
+        - containerPort: 5432
+        volumeMounts: 
+        - name: db-mount
+          mountPath: "/var/lib/postgresql/data"
+        livenessProbe: 
+            exec:
+              command:
+              - pg_isready
+              - -U
+              - postgres
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: db-mount
+          persistentVolumeClaim:
+            claimName: db-pvc
