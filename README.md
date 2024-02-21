@@ -19,21 +19,23 @@ This is a sample project in Golang, with basic CRUD operations. It is integrated
 
 ## Getting Started
 
+### Development environment:
+
+Only docker-compose-dev.yml file is needed. Command:
+```bash
+docker-compose -f docker-compose-dev.yml up
+```
+### Local setup
+
 Clone the project:
 ```bash
 $ git clone https://gitlab.com/mark.zohar3/pharmacyapi.git
 ```
 Open root directory (where docker-compose.yml file resides) and run command: 
 ```bash
-$ docker compose build
+$ docker -f docker-compose-local.yml up
 ```
 
 ## Usage
-
-From root directory of project, run command:
-
-```bash
-$ docker compose up
-```
  
  Navigate to http://localhost:8080/swagger/index.html, where you can run CRUD operations with the help of swagger.
